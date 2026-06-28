@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Conversion Result</title>
+  <link rel="stylesheet" href="/style.css"/>
+</head>
+<body>
+  <main class="card wide">
+    <div class="result-header">
+      <div>
+        <h1>Conversion Result</h1>
+        <p class="sub">Source: <code>{{NAME}}</code></p>
+      </div>
+      <a href="/" class="back-btn">&#8592; Convert another</a>
+    </div>
+    <div class="split-view">
+      <div class="split-panel">
+        <div class="split-label">C# Input</div>
+        <pre class="code">{{SRC}}</pre>
+      </div>
+      <div class="split-panel rust-panel">
+        <div class="panel-header">
+          <div class="split-label rust-label">Rust Output</div>
+          <div class="panel-actions">
+            <button type="button" class="icon-btn" id="copy-btn" title="Copy code" onclick="copyRust()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span class="icon-label">Copy</span>
+            </button>
+            <button type="button" class="icon-btn" title="Download .rs file" onclick="downloadRust()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span class="icon-label">Download</span>
+            </button>
+          </div>
+        </div>
+        <pre class="code" id="rust-output">{{OUTPUT}}</pre>
+      </div>
+    </div>
+  </main>
+  <script>
+    function copyRust() {
+      const code = document.getElementById('rust-output').innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        const btn = document.getElementById('copy-btn');
+        const label = btn.querySelector('.icon-label');
+        label.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => { label.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+      });
+    }
+
+    function downloadRust() {
+      const code = document.getElementById('rust-output').innerText;
+      const name = document.querySelector('.sub code')?.innerText || 'output';
+      const filename = name.replace(/\.cs$/i, '') + '.rs';
+      const blob = new Blob([code], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>

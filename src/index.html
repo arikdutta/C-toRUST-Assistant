@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>C# to Rust Converter</title>
+  <link rel="stylesheet" href="/style.css"/>
+</head>
+<body>
+
+  <!-- ── Progress modal ──────────────────────────────────── -->
+  <div id="progress-overlay" class="progress-overlay">
+    <div class="progress-dialog">
+      <div class="dialog-title">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+             fill="none" stroke="#7c3aed" stroke-width="2.5"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 3l14 9-14 9V3z"/>
+        </svg>
+        <span id="dialog-filename">Converting&hellip;</span>
+      </div>
+
+      <div class="dialog-steps">
+
+        <!-- Step 1 -->
+        <div class="step-row active" id="step1">
+          <div class="step-icon-wrap">
+            <svg class="icon-pending" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/></svg>
+            <svg class="icon-spin"    xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+            <svg class="icon-check"  xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <svg class="icon-err"    xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </div>
+          <div class="step-content">
+            <div class="step-label">Step 1 &mdash; Tree-sitter extraction</div>
+            <div class="step-detail" id="step1-detail"></div>
+            <ul class="step-items" id="step1-items"></ul>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="step-row pending" id="step2">
+          <div class="step-icon-wrap">
+            <svg class="icon-pending" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/></svg>
+            <svg class="icon-spin"    xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+            <svg class="icon-check"  xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <svg class="icon-err"    xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </div>
+          <div class="step-content">
+            <div class="step-label">Step 2 &mdash; Translate each unit via LLM</div>
+            <div class="step-detail" id="step2-detail"></div>
+            <ul class="step-items" id="step2-items"></ul>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="step-row pending" id="step3">
+          <div class="step-icon-wrap">
+            <svg class="icon-pending" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/></svg>
+            <svg class="icon-spin"    xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+            <svg class="icon-check"  xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <svg class="icon-err"    xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </div>
+          <div class="step-content">
+            <div class="step-label">Step 3 &amp; 4 &mdash; Cargo check &amp; repair</div>
+            <div class="step-detail" id="step3-detail"></div>
+            <ul class="step-items" id="step3-items"></ul>
+          </div>
+        </div>
+
+      </div><!-- /.dialog-steps -->
+    </div><!-- /.progress-dialog -->
+  </div><!-- /#progress-overlay -->
+
+  <!-- ── Upload card ──────────────────────────────────────── -->
+  <main class="card">
+    <h1>C# &#8594; Rust</h1>
+    <p class="sub">Upload a .cs file to generate equivalent Rust code</p>
+    <form id="convert-form" method="post" action="/convert" enctype="multipart/form-data">
+      <label class="drop-zone">
+        <input type="file" name="file" accept=".cs" required id="file-input"/>
+        <div class="drop-inner">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="1.5"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          <span class="drop-label" id="drop-label">Choose a .cs file</span>
+          <span class="drop-hint">or drag and drop</span>
+        </div>
+      </label>
+      <button type="submit">Convert to Rust &#8594;</button>
+    </form>
+  </main>
+
+  <script>
+    /* ── File name display ───────────────────────────── */
+    const fileInput = document.getElementById('file-input');
+    const dropLabel = document.getElementById('drop-label');
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files.length > 0) dropLabel.textContent = fileInput.files[0].name;
+    });
+
+    /* ── Dialog helpers ──────────────────────────────── */
+    const overlay = document.getElementById('progress-overlay');
+    const mainCard = document.querySelector('main.card');
+
+    const stepEls = {
+      1: { row: document.getElementById('step1'), detail: document.getElementById('step1-detail'), items: document.getElementById('step1-items') },
+      2: { row: document.getElementById('step2'), detail: document.getElementById('step2-detail'), items: document.getElementById('step2-items') },
+      3: { row: document.getElementById('step3'), detail: document.getElementById('step3-detail'), items: document.getElementById('step3-items') },
+    };
+
+    function setState(n, state) { stepEls[n].row.className = 'step-row ' + state; }
+    function setDetail(n, text)  { stepEls[n].detail.textContent = text; }
+
+    function addItem(n, text, cls) {
+      const li = document.createElement('li');
+      li.textContent = text;
+      if (cls) li.className = cls;
+      stepEls[n].items.appendChild(li);
+    }
+
+    const KIND = {
+      enum_declaration: 'enum', class_declaration: 'class',
+      interface_declaration: 'interface', struct_declaration: 'struct',
+      record_declaration: 'record',
+    };
+
+    function resetDialog() {
+      for (const s of Object.values(stepEls)) {
+        if (s.items) s.items.innerHTML = '';
+        s.detail.textContent = '';
+      }
+      setState(1, 'active');
+      setState(2, 'pending');
+      setState(3, 'pending');
+      const existing = overlay.querySelector('.dialog-error');
+      if (existing) existing.remove();
+    }
+
+    /* ── SSE event handler ───────────────────────────── */
+    function handleEvent(ev) {
+      if (ev.e === 'step1') {
+        setState(1, 'done');
+        setDetail(1, ev.count + ' unit' + (ev.count !== 1 ? 's' : '') + ' found');
+        for (const u of (ev.units || [])) {
+          addItem(1, u.name + ' [' + (KIND[u.kind] || u.kind) + ']', 'done');
+        }
+        setState(2, 'active');
+
+      } else if (ev.e === 'unit') {
+        addItem(2, ev.name + ' → ' + ev.chars + ' chars', 'done');
+
+      } else if (ev.e === 'step3') {
+        setState(2, 'done');
+        setDetail(2, 'All units translated');
+        setState(3, 'active');
+        setDetail(3, 'Running cargo check…');
+
+      } else if (ev.e === 'cargo') {
+        if (ev.ok) {
+          setState(3, 'done');
+          setDetail(3, '✓ Passed on attempt ' + ev.attempt);
+        } else {
+          addItem(3, '✗ attempt ' + ev.attempt + ': cargo check failed', 'fail');
+          if (ev.final) {
+            setState(3, 'done');
+            setDetail(3, 'Proceeding with best effort');
+          }
+        }
+
+      } else if (ev.e === 'cargo_skip') {
+        setState(3, 'done');
+        setDetail(3, 'Cargo not available — skipped');
+
+      } else if (ev.e === 'done') {
+        setState(1, 'done');
+        setState(2, 'done');
+        setState(3, 'done');
+        window.location.href = '/result/' + ev.id;
+
+      } else if (ev.e === 'error') {
+        showError(ev.msg || 'Conversion failed.');
+      }
+    }
+
+    function showError(msg) {
+      const old = overlay.querySelector('.dialog-error');
+      if (old) old.remove();
+
+      const box = document.createElement('div');
+      box.className = 'dialog-error';
+      box.textContent = msg;
+
+      const btn = document.createElement('button');
+      btn.className = 'dialog-retry';
+      btn.textContent = '← Try again';
+      btn.onclick = () => {
+        overlay.classList.remove('visible');
+        mainCard.classList.remove('converting');
+      };
+      box.appendChild(btn);
+      overlay.querySelector('.progress-dialog').appendChild(box);
+    }
+
+    /* ── Form submission ─────────────────────────────── */
+    document.getElementById('convert-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const file = fileInput.files[0];
+      document.getElementById('dialog-filename').textContent =
+        'Converting ' + (file ? file.name : 'your file') + '…';
+
+      resetDialog();
+      overlay.classList.add('visible');
+      mainCard.classList.add('converting');
+
+      try {
+        const res = await fetch('/convert', { method: 'POST', body: new FormData(e.target) });
+        if (!res.ok) throw new Error('Server returned ' + res.status);
+
+        const reader = res.body.getReader();
+        const dec    = new TextDecoder();
+        let buf      = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buf += dec.decode(value, { stream: true });
+
+          // SSE events are separated by double newline
+          const parts = buf.split('\n\n');
+          buf = parts.pop();
+
+          for (const part of parts) {
+            const m = part.match(/^data: (.+)$/m);
+            if (m) {
+              try { handleEvent(JSON.parse(m[1])); } catch (_) {}
+            }
+          }
+        }
+
+        // Flush any trailing data
+        if (buf.trim()) {
+          const m = buf.match(/^data: (.+)$/m);
+          if (m) { try { handleEvent(JSON.parse(m[1])); } catch (_) {} }
+        }
+
+      } catch (err) {
+        showError('Connection error: ' + err.message);
+      }
+    });
+  </script>
+</body>
+</html>

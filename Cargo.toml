@@ -1,0 +1,20 @@
+[package]
+name = "csharp_rust_migrator"
+version = "0.1.0"
+edition = "2021"
+description = "C# to Rust migration assistant — web UI and CLI"
+license = "MIT"
+
+[[bin]]
+name = "migrator"
+path = "src/main.rs"
+
+[dependencies]
+axum = { version = "0.7", features = ["multipart"] }
+tokio = { version = "1", features = ["full"] }
+# Native C# -> Rust pipeline (replaces the former Python subprocess).
+tree-sitter = "0.25"
+tree-sitter-c-sharp = "0.23"
+ureq = { version = "2", features = ["json"] }
+serde_json = "1"
+tokio-stream = "0.1"
