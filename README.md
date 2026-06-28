@@ -2,7 +2,14 @@
 
 ![Test](https://img.shields.io/badge/tests-passing-brightgreen) ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg) ![Crates.io](https://img.shields.io/crates/v/csharp_rust_migrator) ![Downloads](https://img.shields.io/crates/d/csharp_rust_migrator)
 
-A C# → Rust migration assistant. It parses a C# source file with Tree-sitter, extracts each declaration as a unit, translates each one to Rust via an LLM (with a running symbol table for context), and verifies the assembled result with a `cargo check` repair loop. Run with no arguments for a web UI on http://localhost:3000; run with a file path for CLI mode.
+A scalable C#-to-Rust translation pipeline. Tree-sitter handles **structure**
+(splitting source into one translatable unit at a time); an LLM handles
+**meaning** (the actual translation, including ownership, LINQ, async); and
+`cargo check` **grades** the output, feeding compiler errors back into the model
+until the code compiles.
+
+This scales to real repositories because the LLM never sees more than one
+declaration at a time, and every unit is compiler-verified rather than trusted.
 
 With no `ANTHROPIC_API_KEY` set, a built-in mock translator runs so the pipeline works offline.
 
