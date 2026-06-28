@@ -71,13 +71,6 @@ cargo run --release
 # Open http://localhost:3000 in your browser and upload a .cs file
 ```
 
-### CLI
-
-```bash
-cargo run --release -- examples/input.cs > output.rs
-# or after building:
-./target/release/migrator examples/input.cs > output.rs
-```
 
 ## Example
 
