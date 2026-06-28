@@ -176,10 +176,25 @@ fn api_key() -> Option<String> {
 }
 
 /// Minimal `.env` reader (KEY=VALUE per line), so no external dotenv dependency
-/// is needed. Checks the crate-root `.env` and `src/.env`.
+/// is needed. Checks the exe directory, the cwd, and the compile-time crate root.
 fn dotenv_value(name: &str) -> Option<String> {
-    let root = Path::new(env!("CARGO_MANIFEST_DIR"));
-    for candidate in [root.join(".env"), root.join("src").join(".env")] {
+    let compile_time_root = Path::new(env!("CARGO_MANIFEST_DIR"));
+    let exe_dir = std::env::current_exe()
+        .ok()
+        .and_then(|p| p.parent().map(|d| d.to_path_buf()));
+    let cwd = std::env::current_dir().ok();
+
+    let mut candidates = vec![
+        compile_time_root.join(".env"),
+        compile_time_root.join("src").join(".env"),
+    ];
+    if let Some(ref dir) = exe_dir {
+        candidates.push(dir.join(".env"));
+    }
+    if let Some(ref dir) = cwd {
+        candidates.push(dir.join(".env"));
+    }
+    for candidate in candidates {
         let Ok(contents) = std::fs::read_to_string(&candidate) else {
             continue;
         };
