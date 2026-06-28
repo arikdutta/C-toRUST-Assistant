@@ -6,6 +6,10 @@ A C# → Rust migration assistant. It parses a C# source file with Tree-sitter, 
 
 With no `ANTHROPIC_API_KEY` set, a built-in mock translator runs so the pipeline works offline.
 
+
+<img width="1902" height="898" alt="C# to RUST Converter" src="https://github.com/user-attachments/assets/bcd358e3-8bbd-40cc-852e-1adb9fe5cc90" />
+
+
 ## Tech Stack
 
 | Layer | Crate | Purpose |
