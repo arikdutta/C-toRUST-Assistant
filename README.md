@@ -19,6 +19,15 @@ With no `ANTHROPIC_API_KEY` set, a built-in mock translator runs so the pipeline
 | Serialization | `serde_json 1` | JSON request/response handling |
 | Streaming | `tokio-stream 0.1` | Async event streaming |
 
+## How It Works
+
+| Step | File | What it does |
+|---|---|---|
+| 1. Parse C# with Tree-sitter | `extractor.rs` | Finds class/struct/enum/interface boundaries. No translation — structure only. |
+| 2. One node → LLM → Rust | `llm.rs` | Translates a single unit, given a running symbol table of already-translated signatures for compatibility. |
+| 3. Assemble & orchestrate | `converter.rs` | Maintains the symbol table across units and drives the per-unit translation pass. |
+| 4. `cargo check` → feed errors back | `cargo_check.rs` | Runs the compiler; on failure, re-prompts the LLM with the errors and retries up to MAX_REPAIRS. |
+
 ## Features
 
 - Parses C# source files using the `tree-sitter-c-sharp` grammar — handles nested, multiline, and namespaced declarations correctly.
